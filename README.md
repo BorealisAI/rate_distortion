@@ -1,5 +1,5 @@
 ## Evaluating Lossy Compression Rates of Deep Generative Models
-The code accompanying the ICML paper: [Evaluating Lossy Compression Rates of Deep Generative Models](https://proceedings.icml.cc/static/paper_files/icml/2020/5098-Paper.pdf)
+The code accompanying the ICML paper: [Evaluating Lossy Compression Rates of Deep Generative Models](https://proceedings.icml.cc/static/paper_files/icml/2020/5098-Paper.pdf). This repo is released as it is, and will not be maintained in the future.
 
 **Authors**: [Sicong Huang*](https://www.cs.toronto.edu/~huang/), [Alireza Makhzani*](http://www.alireza.ai/), [Yanshuai Cao
 ](http://www.cs.toronto.edu/~g8acai/index.html), [Roger Grosse](https://www.cs.toronto.edu/~rgrosse/) (*Equal contribution)
