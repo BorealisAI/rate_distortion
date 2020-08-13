@@ -1,0 +1,9 @@
+#anaconda3
+Python==3.6.6 
+Pytorch==1.0
+tqdm
+TensorboardX
+tensorflow
+matplotlib
+Scipi
+#lite_tracer 
