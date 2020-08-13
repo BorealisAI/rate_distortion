@@ -1,5 +1,5 @@
 ## Evaluating Lossy Compression Rates of Deep Generative Models
-The code accompanying the ICML paper: Evaluating Lossy Compression Rates of Deep Generative Models
+The code accompanying the ICML paper: [Evaluating Lossy Compression Rates of Deep Generative Models](https://proceedings.icml.cc/static/paper_files/icml/2020/5098-Paper.pdf)
 
 **Authors**: [Sicong Huang*](https://www.cs.toronto.edu/~huang/), [Alireza Makhzani*](http://www.alireza.ai/), [Yanshuai Cao
 ](http://www.cs.toronto.edu/~g8acai/index.html), [Roger Grosse](https://www.cs.toronto.edu/~rgrosse/) (*Equal contribution)
@@ -25,7 +25,6 @@ There are only 2 argparse arguments:
 
 
 The configuration for each experiment is defined by an Hparam object registered in  [rate_distortion/hparams](rate_distortion/hparams). The default value for an undefined field is **None**. The Hparam object is hierarchical and compositional for modularity. 
-
 
 
 This codebase has a self-contained system for keeping track of checkpoints and outputs based on the Hparam object. To load checkpoint from another experiment registered in the codebase, assign **load_hparam_name** to the name of a registered **hparam_set** in the codebase. If the model you want to test is not trained with this codebase, to load your model, you can simply set **specific_model_path** to the path of your decoder weights. 
@@ -74,13 +73,13 @@ This codebase has a self-contained system for keeping track of checkpoints and o
  
 
 ## Test your own generative models. 
-The codebase is also modularized for testing your own decoder-based generative models. You need to register your model under [rate_distortion/models/user_models](rate_distortion/models/user_models), and register the Hparam object at [rate_distortion/hparams/user_models](rate_distortion/models/user_models). Your model should come with its decoder variance model.x_logvar as a scalar or vector tensor. Set **specific_model_path** to the path of your decoder weights.
+The codebase is also modularized for testing your own decoder-based generative models. You need to register your model under [rate_distortion/models/user_models](rate_distortion/models/user_models.py), and register the Hparam object at [rate_distortion/hparams/user_models](rate_distortion/models/user_models.py). Your model should come with its decoder variance model.x_logvar as a scalar or vector tensor. Set **specific_model_path** to the path of your decoder weights.
 
 ### PyTorch: 
 If the generative models is trained in PyTorch, the checkpoint should contain the key "state_dict" as the weights of the model.
 
 ### Others:
-If the generative models is trained in other framewords, you'll need to manuually bridge and load the weights. For example, the AAEs were trained in tensorflow, with the weights saved as numpy, and then loaded as nn.Parameter in PyTorch. Refer to[rate_distortion/utils/aad_utils](rate_distortion/utils/aad_utils) for more details.
+If the generative models is trained in other framewords, you'll need to manuually bridge and load the weights. For example, the AAEs were trained in tensorflow, with the weights saved as numpy, and then loaded as nn.Parameter in PyTorch. Refer to[rate_distortion/utils/aae_utils](rate_distortion/utils/aae_utils.py) for more details.
   
 
 ## Detailed Experimental Settings
