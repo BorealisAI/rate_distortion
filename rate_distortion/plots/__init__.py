@@ -14,6 +14,5 @@ __all__ = [
 If you need to register models in more files, add them here.
 """
 from .icml_plots import *
-from .icml_plots_test import *
 from .registry import *
 from .user_plots import *
