@@ -84,23 +84,6 @@ def prepare_vae(writer, hparams):
     return model
 
 
-def vae_elbo(likelihood, mu, logvar):
-    """ Return the mean of elbo of batch of data
-    KLD_element.size()=logvar.size()=mu.size() torch.Size([batch_size*k, 10])
-
-    likelihood + KLD between two normal distribution.
-    Note that here it's actually negative elbo
-    KLD between two normal
-    KLD = 0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
-    """
-
-    KLD_element = 0.5 * (mu**2 + logvar.exp() - 1 - 2 * logvar)
-    KLD = torch.sum(KLD_element, dim=1)
-    loss = torch.mean(-likelihood + KLD)
-
-    return loss
-
-
 def log_normal_likelihood(x, mean, logvar):
     """Implementation WITH constant
     based on https://github.com/lxuechen/BDMC/blob/master/utils.py
