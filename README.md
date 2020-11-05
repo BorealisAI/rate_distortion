@@ -27,8 +27,8 @@ There are only 2 argparse arguments:
 The configuration for each experiment is defined by an Hparam object registered in  [rate_distortion/hparams](rate_distortion/hparams). The default value for an undefined field is **None**. The Hparam object is hierarchical and compositional for modularity. 
 
 
-This codebase has a self-contained system for keeping track of checkpoints and outputs based on the Hparam object. To load checkpoint from another experiment registered in the codebase, assign **load_hparam_name** to the name of a registered **hparam_set** in the codebase. If the model you want to test is not trained with this codebase, to load your model, you can simply set **specific_model_path** to the path of your decoder weights. 
 
+This codebase has a self-contained system for keeping track of checkpoints and outputs based on the Hparam object. To load checkpoint from another experiment registered in the codebase, assign **load_hparam_name** to the name of a registered **hparam_set** in the codebase. If the model you want to test is not trained with this codebase, to load your model, you can simply set **specific_model_path** to the path of your decoder weights. 
 
 ## Reproducing our results.
 
@@ -52,14 +52,14 @@ This codebase has a self-contained system for keeping track of checkpoints and o
 
   To conform to mathematical correctness when tuning the HMC step sizes, for each setting there are two round of experiments. During the first round, step sizes of HMC are adaptively tuned and saved. During the second round, step sizes are loaded and the rate distortion curve (or BDMC gap) was computed with another random seed.
 
-  All experiments used in the paper can be found inside [rate_distortion/hparams](rate_distortion/hparams), and you can reproduce all experiments by running the sbatch files in a particular order. The ordering is important becasue there are dependencies between different runs. The first round of HMC step-size tuning experiments must be finished before the second round of runs can load step sizes.
+  All experiments used in the paper can be found inside [rate_distortion/hparams](rate_distortion/hparams), and you can reproduce all experiments by running the sbatch files in a particular order. The ordering is important because there are dependencies between different runs. The first round of HMC step-size tuning experiments must be finished before the second round of runs can load step sizes.
 
 - First round<br />
   All **.sh** files are sbatch files in [rate_distortion/hparams](rate_distortion/hparams) and to run them, simply
   ```
   sbatch FILENAME.sh
   ```
-  Notice that if you don't already have the datasets downloaded, running multiple runs concurrently might cause interference of the data loading/downloading processes. So a good practive is to let the data downloding process finish before starting another runs related to the same dataset. This is taken care of by the following sbatch files and again it's important to wait for one to finish before starting the next. First run **analytical.sh** which download MNIST and train a linear VAE. You can also use this to check whether everything is set up properly. Then run **train_models.sh** to train the VAEs, and then run **first_round.sh**, and this will reproduce the first round of experiments where HMC step sizes are adaptively tuned. Same with BDMC gaps, run **bdmc_first_round.sh**. 
+  Notice that if you don't already have the datasets downloaded, running multiple runs concurrently might cause interference of the data loading/downloading processes. So a good practice is to let the data downloading process finish before starting another runs related to the same dataset. This is taken care of by the following sbatch files and again it's important to wait for one to finish before starting the next. First run **analytical.sh** which download MNIST and train a linear VAE. You can also use this to check whether everything is set up properly. Then run **train_models.sh** to train the VAEs, and then run **first_round.sh**, and this will reproduce the first round of experiments where HMC step sizes are adaptively tuned. Same with BDMC gaps, run **bdmc_first_round.sh**. 
 
 - Second round<br />
   After the first round is finished, run **second_round.sh** and it will load the saved step sizes and run the experiments again with another random seed. For BDMC, run **bdmc_second_round.sh**. If there's a "rerun" in the name of any experiment, it indicates that it's in this group.  
@@ -73,13 +73,13 @@ This codebase has a self-contained system for keeping track of checkpoints and o
  
 
 ## Test your own generative models. 
-The codebase is also modularized for testing your own decoder-based generative models. You need to register your model under [rate_distortion/models/user_models](rate_distortion/models/user_models.py), and register the Hparam object at [rate_distortion/hparams/user_models](rate_distortion/models/user_models.py). Your model should come with its decoder variance model.x_logvar as a scalar or vector tensor. Set **specific_model_path** to the path of your decoder weights.
+The codebase is also modularized for testing your own decoder-based generative models. You need to register your model under [rate_distortion/models/user_models](rate_distortion/models/user_models), and register the Hparam object at [rate_distortion/hparams/user_models](rate_distortion/models/user_models). Your model should come with its decoder variance model.x_logvar as a scalar or vector tensor. Set **specific_model_path** to the path of your decoder weights.
 
 ### PyTorch: 
 If the generative models is trained in PyTorch, the checkpoint should contain the key "state_dict" as the weights of the model.
 
 ### Others:
-If the generative models is trained in other framewords, you'll need to manuually bridge and load the weights. For example, the AAEs were trained in tensorflow, with the weights saved as numpy, and then loaded as nn.Parameter in PyTorch. Refer to[rate_distortion/utils/aae_utils](rate_distortion/utils/aae_utils.py) for more details.
+If the generative models is trained in other frameworks, you'll need to manually bridge and load the weights. For example, the AAEs were trained in tensorflow, with the weights saved as numpy, and then loaded as nn.Parameter in PyTorch. Refer to[rate_distortion/utils/aad_utils](rate_distortion/utils/aad_utils) for more details.
   
 
 ## Detailed Experimental Settings
@@ -89,12 +89,12 @@ More details on how to control experimental settings can be found below.
 General configuration:
 
 - `specific_model_path`: (str) Set to the path to the decoder weights for your own experiments. Set to None if you are reproducing our experiments.
-- `original_experiment`: (boolean) This should be set to **True** when the checkpoint or the model is from the paper. When you are testing your own generative model, set this False and it will load from `specific_model_path` instead of the directories generated by this codebase. You may need to custimize the **load_user_model** function in [rate_distortion/utils/experiment_utils.py](rate_distortion/utils/experiment_utils.py) for your own generative model.   
+- `original_experiment`: (boolean) This should be set to **True** when the checkpoint or the model is from the paper. When you are testing your own generative model, set this False and it will load from `specific_model_path` instead of the directories generated by this codebase. You may need to custimize the **load_user_model** function in [rate_distortion/utiles/experiment_utils.py](rate_distortion/utiles/experiment_utils.py) for your own generative model.   
 - `output_root_dir`: (str) The root dir for the experiment workspace. Experiment results, checkpoints will be saved in subfolders under this directory.
 - `group_list`: (list) A list specifying the file tree structure for the output of this experiment, inside the `output_root_dir`.   
 - `step_sizes_target`: (str) When not defined or set to None, HMC step sizes adaptively tunned and saved during AIS. 
-  When specifed as the name of hparam_set of another previously finished experiment, 
-  HMC step sizez will be loaded from that experiment.
+  When specified as the name of hparam_set of another previously finished experiment, 
+  HMC step sizes will be loaded from that experiment.
 - `train_first`: (boolean) If set to true, experiment will first run training algorithm, and then run RD evaluation. Otherwise only RD evaluation will be run. 
 - `model_name`: (str) The name of the model you want to use. The model must be registered under [rate_distortion/models](rate_distortion/models).
 
@@ -108,7 +108,7 @@ Sub-hparams:
 **rd** sub-Hparam: 
   - `rd_data_list`: (list) The list of data to be used. Can include only test, or both test and train. 
   - `n_chains`: (int) The number of independent AIS chains per data point.
-  - `anneal_steps`: (int) The number of annealing steps(intermedia distributions) for AIS. Note that this is not the total steps yet. Total step will also include the patched intermediate distributions as described in the paper. 
+  - `anneal_steps`: (int) The number of annealing steps(intermediate distributions) for AIS. Note that this is not the total steps yet. Total step will also include the patched intermediate distributions as described in the paper. 
   - `temp_schedule`: (str) Temperature schedule. Just use "sigmoid". 
   - `leap_steps`: (int) Number of leap frog steps for HMC. 
   - `acceptance_prob`: (float) Average acceptance probability for adaptive step size tuning in HMC. 
@@ -142,6 +142,9 @@ The rest: normally the below settings do not need to be changed.
   - `n_test_batch`: (int) Number of batch you want to test on during training or IWAE. During training it'll test on a held-out validation set. 
   - `mixture_weight`: (int) The mixture weight for the bad prior in the mixture of prior experiment 
   - `bad_std`: (int) The standard deviation of the Gaussian in the bad prior
+
+
+
 
 
 
