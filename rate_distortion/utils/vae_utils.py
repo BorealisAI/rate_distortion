@@ -32,7 +32,7 @@ def prepare_vae(writer, hparams):
     """
     model = get_model(hparams).to(hparams.device)
 
-    if hparams.train_first:
+    if hparams.train_first or hparams.checkpoint_path is None:
         optimizer = optim.Adam(model.parameters(), lr=hparams.learning_rate)
         if hparams.resume_training:
             try:
