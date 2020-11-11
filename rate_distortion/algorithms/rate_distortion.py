@@ -8,7 +8,7 @@
 #!/usr/bin/env python3
 
 import torch
-from ..utils.vae_utils import vae_elbo, log_normal_likelihood
+from ..utils.vae_utils import log_normal_likelihood
 from ..utils.computation_utils import normalize_logws, singleton_repeat, normalized_weights_test
 from ..utils.experiment_utils import note_taking, plot_rate_distrotion, AISTracker, plot_both
 from .bdmc import *
