@@ -9,7 +9,7 @@
 
 import os
 import torch
-from ..utils.vae_utils import vae_elbo, log_normal_likelihood
+from ..utils.vae_utils import log_normal_likelihood
 from ..utils.experiment_utils import note_taking, log_down_likelihood, extract_Wb, plot_analytic_rate_distrotion
 import numpy as np
 import matplotlib
