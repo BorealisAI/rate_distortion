@@ -1,5 +1,4 @@
 # Copyright (c) 2018-present, Royal Bank of Canada.
-# Copyright (c) 2018 Xuechen Li
 # All rights reserved.
 #
 # This source code is licensed under the license found in the
@@ -15,84 +14,6 @@ from .ais import run_ais_chain
 from ..utils.experiment_utils import note_taking, initialze_BDMC, init_dir
 import numpy as np
 from ..data.load_data import load_simulate_data
-
-
-def run_bdmc(model,
-             hparams,
-             data_loader,
-             forward_schedule,
-             task_params,
-             start_state=None,
-             init_weights=None,
-             init_step_size=None,
-             init_history=None):
-    """Run BDMC.
-
-    Args:
-        model : Any model with a decoder p(x|z)
-        data_loader (iterator): iterator to loop over pairs of data; the first
-            entry being `x`, the second being `z` sampled from the true
-            posterior `p(z|x)`, which is equivalent as first sample from prior and then 
-            sample x from the decoder.
-        forward_schedule (list or numpy.ndarray): forward temperature schedule;
-    Returns:
-        please refer to ais.py. The only difference is bdmc is also returning the upper bound, and the average of lower and upper bound. 
-    """
-    step_sizes_path = hparams.messenger.step_sizes_dir + "sim_forward_"
-
-    forward_logws, approx_post_zs, simulated_data, importance_weights, epsilon, accept_hist, _ = run_ais_chain(
-        model,
-        data_loader,
-        mode='forward',
-        schedule=forward_schedule,
-        hparams=hparams,
-        task_params=task_params,
-        start_state=start_state,
-        init_weights=init_weights,
-        init_step_size=init_step_size,
-        init_history=init_history,
-        step_sizes_dir=step_sizes_path)
-
-    # run backward chain
-    backward_schedule = np.flip(forward_schedule, axis=0)
-    step_sizes_path = hparams.messenger.step_sizes_dir + "sim_backward_"
-    backward_logws = run_ais_chain(
-        model,
-        data_loader,
-        mode='backward',
-        schedule=backward_schedule,
-        hparams=hparams,
-        task_params=task_params,
-        start_state=None,
-        init_weights=None,
-        step_sizes_dir=step_sizes_path)
-
-    upper_bounds = list()
-    lower_bounds = list()
-
-    # average out w.r.t each batch of data
-    for _, (forward, backward) in enumerate(zip(forward_logws, backward_logws)):
-        lower_bounds.append(forward.mean().cpu().numpy())
-        upper_bounds.append(backward.mean().cpu().numpy())
-
-    # grand average
-    upper_bounds_avgs = np.mean(upper_bounds)
-    lower_bounds_avgs = np.mean(lower_bounds)
-    mean_avgs = (upper_bounds_avgs + lower_bounds_avgs) / 2
-    note_taking('Average bounds on simulated data: lower {}, upper {}'.format(
-        lower_bounds_avgs, upper_bounds_avgs).center(80))
-
-    forward_logws_array = [tensor.cpu().numpy() for tensor in forward_logws]
-    forward_logws_array = np.stack(forward_logws_array, axis=0)
-    backward_logws_array = [tensor.cpu().numpy() for tensor in backward_logws]
-    backward_logws_array = np.stack(backward_logws_array, axis=0)
-
-    npy_path = hparams.messenger.arxiv_dir + (
-        ("result_beta_" + str(hparams.messenger.beta))
-        if hparams.messenger.beta is not None else "") + ".npz"
-    np.savez(npy_path, forward_logws_array, backward_logws_array)
-    return upper_bounds_avgs, mean_avgs, lower_bounds_avgs, approx_post_zs, simulated_data, importance_weights, epsilon, accept_hist
-
 
 def run_BDMC_betas(model, tempreture_dict, hparams, rep_model):
     BDMC_tempreture_dict, BDMC_betas, select_indexs = initialze_BDMC(
